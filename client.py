@@ -4,7 +4,8 @@ import argparse
 import os
 import sys
 import tkinter as tk
-
+from modulconnetdb import *
+import datetime
 
 class Send(threading.Thread):
 
@@ -117,6 +118,11 @@ class Client:
 
         # Send message to server for broadcasting
         else:
+            datetime_object = datetime.datetime.now()
+            stri = str(datetime_object)
+            t = stri.split('.')
+            datetime_str = t[0]
+            insert_message(self.name, message, datetime_str)
             self.sock.sendall('{}: {}'.format(self.name, message).encode('ascii'))
 
 
@@ -165,10 +171,13 @@ def main(host, port):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Chatroom Server')
-    parser.add_argument('host', help='Interface the server listens at')
-    parser.add_argument('-p', metavar='PORT', type=int, default=1060,
-                        help='TCP port (default 1060)')
-    args = parser.parse_args()
-
-    main(args.host, args.p)
+    HOST = '127.0.0.1'
+    PORT = 1060
+    main(HOST, PORT)
+    # parser = argparse.ArgumentParser(description='Chatroom Server')
+    # parser.add_argument('host', help='Interface the server listens at')
+    # parser.add_argument('-p', metavar='PORT', type=int, default=1060,
+    #                     help='TCP port (default 1060)')
+    # args = parser.parse_args()
+    #
+    # main(args.host, args.p)

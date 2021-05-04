@@ -72,7 +72,6 @@ class ServerSocket(threading.Thread):
                 return
 
     def send(self, message):
-
         self.sc.sendall(message.encode('ascii'))
 
 
@@ -88,15 +87,10 @@ def exit(server):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Chatroom Server')
-
-    parser.add_argument('host', help='Interface the server listens at')
-    parser.add_argument('-p', metavar='PORT', type=int, default=1060,
-                        help='TCP port (default 1060)')
-    args = parser.parse_args()
-
+    HOST = '127.0.0.1'
+    PORT = 1060
     # Create and start server thread
-    server = Server(args.host, args.p)
+    server = Server(HOST, PORT)
     server.start()
     #
     exit = threading.Thread(target=exit, args=(server,))
