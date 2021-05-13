@@ -45,8 +45,11 @@ def arr_message():
         conn.close()
 
     return arr_messages
-
-
+def create_database():
+    query = "CREATE SCHEMA IF NOT EXISTS `chat` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ; USE `chat` ; CREATE TABLE IF NOT EXISTS `chat`.`chatroom` (`user` VARCHAR(45) NULL DEFAULT NULL,`text` TEXT NULL DEFAULT NULL,`datetimechat` DATETIME NULL DEFAULT NULL)ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
+    conn = connect()
+    cursor = conn.connect()
+    cursor.execute(query)
 def insert_message(user, text, datetime):
     query = "INSERT INTO chat.chatroom( user, text, datetimechat) " \
             "VALUES(%s,%s,%s)"
