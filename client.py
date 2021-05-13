@@ -101,6 +101,11 @@ class Client:
         print('{}: '.format(self.name), end='')
 
         return receive
+    def load_old_message(self):
+        arr_messages = arr_message()
+        for i in arr_messages:
+            message = i
+            self.messages.insert(tk.END, '{}: {}'.format(message[0], message[1]))
 
     def send(self, text_input):
 
@@ -122,7 +127,7 @@ class Client:
             stri = str(datetime_object)
             t = stri.split('.')
             datetime_str = t[0]
-            insert_message(self.name, message, datetime_str)
+            # insert_message(self.name, message, datetime_str)
             self.sock.sendall('{}: {}'.format(self.name, message).encode('ascii'))
 
 
@@ -141,7 +146,7 @@ def main(host, port):
     )
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
     messages.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
+    #
     client.messages = messages
     receive.messages = messages
 
@@ -150,6 +155,7 @@ def main(host, port):
     frm_entry = tk.Frame(master=window)
     text_input = tk.Entry(master=frm_entry)
     text_input.pack(fill=tk.BOTH, expand=True)
+    client.load_old_message()
     text_input.bind("<Return>", lambda x: client.send(text_input))
     text_input.insert(0, "Your message here.")
 
@@ -166,7 +172,7 @@ def main(host, port):
     window.rowconfigure(1, minsize=50, weight=0)
     window.columnconfigure(0, minsize=500, weight=1)
     window.columnconfigure(1, minsize=200, weight=0)
-
+    #
     window.mainloop()
 
 

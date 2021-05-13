@@ -23,7 +23,8 @@ def connect():
     return conn
 
 
-def show_message():
+def arr_message():
+    arr_messages = []
     try:
         conn = connect()
         cursor = conn.cursor()
@@ -32,7 +33,7 @@ def show_message():
         row = cursor.fetchone()
 
         while row is not None:
-            print(row)
+            arr_messages.append(row)
             row = cursor.fetchone()
 
     except Error as e:
@@ -43,13 +44,15 @@ def show_message():
         cursor.close()
         conn.close()
 
+    return arr_messages
+
 
 def insert_message(user, text, datetime):
-    query = "INSERT INTO chat.chatroom(user, text, datetimechat) " \
+    query = "INSERT INTO chat.chatroom( user, text, datetimechat) " \
             "VALUES(%s,%s,%s)"
     # INSERT INTO `chat`.`chatroom`(`user`, `text`, `datetimechat`) VALUES('dnt', '456', '2021-05-15 13:00:00');
 
-    args = (user, text, datetime)
+    args = ( user, text, datetime)
 
     try:
         conn = connect()
@@ -60,7 +63,8 @@ def insert_message(user, text, datetime):
         if cursor.lastrowid:
             print('ID insert là:', cursor.lastrowid)
         else:
-            print('Insert thất bại')
+            print(cursor)
+            # print('Insert thất bại')
 
         conn.commit()
     except Error as error:
@@ -71,8 +75,19 @@ def insert_message(user, text, datetime):
         cursor.close()
         conn.close()
 
+def load_old_message():
+    arr_messages = arr_message()
+    print(arr_messages)
+    print(type(arr_messages))
+    for i in arr_messages:
+        message = i
+        print(message[0])
+        print(message[1])
+        print(message[2])
+
 # Test thử
-# conn = connect()
-# print(conn)
-# show_books()
+conn = connect()
+print(conn)
+load_old_message()
+
 # insert_book('dnt', 'huhu', '2021-10-15 22:22:22')
