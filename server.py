@@ -1,7 +1,7 @@
+import os
 import threading
 import socket
-import os
-
+import tkinter as tk
 
 class Server(threading.Thread):
 
@@ -76,7 +76,7 @@ class ServerSocket(threading.Thread):
 
 def exit(server):
     while True:
-        ipt = input('')
+        ipt = 'q'
         if ipt == 'q':
             print('Closing all connections...')
             for connection in server.connections:
@@ -84,13 +84,56 @@ def exit(server):
             print('Shutting down the server...')
             os._exit(0)
 
+class App:
+    def __init__(self):
+        self.host = None
+        self.port = None
+        self.server = None
+    def get_host_port(self):
+        root = tk.Tk()
+        root.title("Server")
+        root.geometry("300x250")
+
+        host_lb = tk.Label(root, text="HOST").place(x=30, y=50)
+        port_lb = tk.Label(root, text="PORT").place(x=30, y=90)
+
+
+
+
+        start_btn = tk.Button(root, text="Start", command=lambda: self.get_str_host_port(host_input, port_input, root))
+        start_btn.place(x=30, y=170)
+
+        host_input = tk.Entry(root)
+        host_input.place(x=80, y=50)
+        host_input.insert(0, "127.0.0.1")
+
+        port_input = tk.Entry(root)
+        port_input.place(x=80, y=90)
+        port_input.insert(0, "1060")
+
+        quit_btn = tk.Button(root, text="Quit", command=lambda: self.quit())
+        quit_btn.place(x=80,y=170)
+
+        root.mainloop()
+
+    def get_str_host_port(self, host_input, port_input, root):
+        self.host = host_input.get()
+        self.port = port_input.get()
+        self.host = str(self.host)
+        self.port = int(self.port)
+        root.destroy()
+
 
 if __name__ == '__main__':
+    # app = App()
+    # app.get_host_port()
+    # HOST,PORT = app.host,app.port
+    #
     HOST = '127.0.0.1'
     PORT = 1060
-    # Create and start server thread
+    # # Create and start server thread
     server = Server(HOST, PORT)
     server.start()
-    #
+    # #
     exit = threading.Thread(target=exit, args=(server,))
     exit.start()

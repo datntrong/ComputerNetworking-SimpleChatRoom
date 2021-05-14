@@ -78,7 +78,6 @@ class Client:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.name = name
         self.messages = None
-
     def start(self):
 
         print('Trying to connect to {}:{}...'.format(self.host, self.port))
@@ -133,7 +132,7 @@ class Client:
             stri = str(datetime_object)
             t = stri.split('.')
             datetime_str = t[0]
-            # insert_message(self.name, message, datetime_str)
+            insert_message(self.name, message, datetime_str)
             self.sock.sendall('{}: {}'.format(self.name, message).encode('ascii'))
 
 
@@ -207,7 +206,7 @@ class App:
         frm_entry = tk.Frame(master=root)
         text_input = tk.Entry(master=frm_entry)
         text_input.pack(fill=tk.BOTH, expand=True)
-        # self.client.load_old_message()
+        self.client.load_old_message()
         text_input.bind("<Return>", lambda x: self.client.send(text_input))
         text_input.insert(0, "Your message here.")
 
@@ -252,6 +251,25 @@ class App:
 
 
         root.mainloop()
+
+    def get_str_host_port(self, host_input, port_input,user_import, root):
+        self.host1 = host_input.get()
+        self.port1 = port_input.get()
+        print(self.host1)
+        print(type(self.host1))
+        self.host1 = str(self.host1)
+        self.port1 = int(self.port1)
+        self.user = user_import.get()
+        root.quit()
+        root.destroy()
+
+
+
+def main():
+    # create_database()
+    app = App()
+    app.get_host_port()
+    app.interface()
 
     def get_str_host_port(self, host_input, port_input,user_import, root):
         self.host1 = host_input.get()
