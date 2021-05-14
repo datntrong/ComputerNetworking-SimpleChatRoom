@@ -1,23 +1,24 @@
-from mysql.connector import MySQLConnection, Error
-import datetime
+import mysql.connector as sql
+
+
 def connect():
     db_config = {
         'host': 'localhost',
-        'database': 'chat',
         'user': 'root',
+        'database': 'chat',
         'password': 'ichyyyyy'
     }
-
+    print(type(db_config))
     # Biến lưu trữ kết nối
     conn = None
 
     try:
-        conn = MySQLConnection(**db_config)
+        conn = sql.MySQLConnection(**db_config)
 
         if conn.is_connected():
             return conn
 
-    except Error as error:
+    except sql.Error as error:
         print(error)
 
     return conn
@@ -36,7 +37,7 @@ def arr_message():
             arr_messages.append(row)
             row = cursor.fetchone()
 
-    except Error as e:
+    except sql.Error as e:
         print(e)
 
     finally:
@@ -45,17 +46,28 @@ def arr_message():
         conn.close()
 
     return arr_messages
+
+
+def delete_database():
+    query = "DELETE FROM chat.chatroom;"
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(query)
+
+
 def create_database():
     query = "CREATE SCHEMA IF NOT EXISTS `chat` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ; USE `chat` ; CREATE TABLE IF NOT EXISTS `chat`.`chatroom` (`user` VARCHAR(45) NULL DEFAULT NULL,`text` TEXT NULL DEFAULT NULL,`datetimechat` DATETIME NULL DEFAULT NULL)ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
     conn = connect()
-    cursor = conn.connect()
+    cursor = conn.cursor()
     cursor.execute(query)
+
+
 def insert_message(user, text, datetime):
     query = "INSERT INTO chat.chatroom( user, text, datetimechat) " \
             "VALUES(%s,%s,%s)"
     # INSERT INTO `chat`.`chatroom`(`user`, `text`, `datetimechat`) VALUES('dnt', '456', '2021-05-15 13:00:00');
 
-    args = ( user, text, datetime)
+    args = (user, text, datetime)
 
     try:
         conn = connect()
@@ -70,13 +82,14 @@ def insert_message(user, text, datetime):
             # print('Insert thất bại')
 
         conn.commit()
-    except Error as error:
+    except sql.Error as error:
         print(error)
 
     finally:
         # Đóng kết nối
         cursor.close()
         conn.close()
+
 
 def load_old_message():
     arr_messages = arr_message()
@@ -88,9 +101,12 @@ def load_old_message():
         print(message[1])
         print(message[2])
 
+
 # Test thử
 conn = connect()
 print(conn)
-load_old_message()
+delete_database()
+# create_database()
+# load_old_message()
 
 # insert_book('dnt', 'huhu', '2021-10-15 22:22:22')

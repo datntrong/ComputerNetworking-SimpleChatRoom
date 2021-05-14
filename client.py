@@ -4,6 +4,8 @@ import argparse
 import os
 import sys
 import tkinter as tk
+import webbrowser
+
 from modulconnetdb import *
 import datetime
 
@@ -34,8 +36,6 @@ class Send(threading.Thread):
         print('\nQuitting...')
         self.sock.close()
         os._exit(0)
-
-
 
 
 class Receive(threading.Thread):
@@ -78,6 +78,7 @@ class Client:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.name = name
         self.messages = None
+
     def start(self):
 
         print('Trying to connect to {}:{}...'.format(self.host, self.port))
@@ -145,7 +146,7 @@ class App:
         self.user = None
 
     def interface(self):
-        self.client = Client(self.host1, self.port1,self.user)
+        self.client = Client(self.host1, self.port1, self.user)
         self.receive = self.client.start()
         root = tk.Tk()
         root.title('Chatroom')
@@ -158,11 +159,11 @@ class App:
 
         menubar = tk.Menu(root)
         file = tk.Menu(menubar, tearoff=0)
-        file.add_command(label="New")
-        file.add_command(label="Open")
-        file.add_command(label="Save")
-        file.add_command(label="Save as...")
-        file.add_command(label="Close")
+        # file.add_command(label="New")
+        # file.add_command(label="Open")
+        # file.add_command(label="Save")
+        # file.add_command(label="Save as...")
+        # file.add_command(label="Close")
 
         file.add_separator()
 
@@ -170,23 +171,22 @@ class App:
 
         menubar.add_cascade(label="File", menu=file)
         edit = tk.Menu(menubar, tearoff=0)
-        edit.add_command(label="Undo")
+        # edit.add_command(label="Undo")
 
         edit.add_separator()
 
-        edit.add_command(label="Cut")
-        edit.add_command(label="Copy")
-        edit.add_command(label="Paste")
-        edit.add_command(label="Delete")
-        edit.add_command(label="Select All")
+        # edit.add_command(label="Cut")
+        # edit.add_command(label="Copy")
+        # edit.add_command(label="Paste")
+        edit.add_command(label="Delete", command=lambda: self.del_db())
+        # edit.add_command(label="Select All")
 
         menubar.add_cascade(label="Edit", menu=edit)
         help = tk.Menu(menubar, tearoff=0)
-        help.add_command(label="About")
+        help.add_command(label="About",command = lambda :self.about())
         menubar.add_cascade(label="Help", menu=help)
 
         root.config(menu=menubar)
-
 
         frm_messages = tk.Frame(master=root)
         scrollbar = tk.Scrollbar(master=frm_messages)
@@ -222,8 +222,13 @@ class App:
 
     def command_btn_send(self, text_input):
         self.client.send(text_input)
-    def donothing(self):
-        print("a")
+
+    def del_db(self):
+        delete_database()
+        self.client.load_old_message()
+
+    def about(self):
+        webbrowser.open('https://github.com/datntrong/ComputerNetworking-SimpleChatRoom')  # Go to example.com
 
     def get_host_port(self):
         root = tk.Tk()
@@ -233,9 +238,8 @@ class App:
         port_lb = tk.Label(root, text="PORT").place(x=30, y=90)
         user_lb = tk.Label(root, text="Name").place(x=30, y=130)
 
-
-
-        submit_btn = tk.Button(root, text="Submit", command=lambda: self.get_str_host_port(host_input, port_input,user_import,root))
+        submit_btn = tk.Button(root, text="Submit",
+                               command=lambda: self.get_str_host_port(host_input, port_input, user_import, root))
         submit_btn.place(x=30, y=170)
 
         host_input = tk.Entry(root)
@@ -249,10 +253,9 @@ class App:
         user_import = tk.Entry(root)
         user_import.place(x=80, y=130)
 
-
         root.mainloop()
 
-    def get_str_host_port(self, host_input, port_input,user_import, root):
+    def get_str_host_port(self, host_input, port_input, user_import, root):
         self.host1 = host_input.get()
         self.port1 = port_input.get()
         print(self.host1)
@@ -264,13 +267,11 @@ class App:
         root.destroy()
 
 
-
 def main():
     # create_database()
     app = App()
     app.get_host_port()
     app.interface()
-
 
 
 def main():
