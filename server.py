@@ -74,22 +74,22 @@ class ServerSocket(threading.Thread):
         self.sc.sendall(message.encode('ascii'))
 
 
-def exit(server):
-    while True:
-        ipt = 'q'
-        if ipt == 'q':
-            print('Closing all connections...')
-            for connection in server.connections:
-                connection.sc.close()
-            print('Shutting down the server...')
-            os._exit(0)
+# def exit(server):
+#     while True:
+#         ipt = input('')
+#         if ipt == 'q':
+#             print('Closing all connections...')
+#             for connection in server.connections:
+#                 connection.sc.close()
+#             print('Shutting down the server...')
+#             os._exit(0)
 
 class App:
     def __init__(self):
         self.host = None
         self.port = None
         self.server = None
-    def get_host_port(self):
+    def start(self):
         root = tk.Tk()
         root.title("Server")
         root.geometry("300x250")
@@ -121,19 +121,22 @@ class App:
         self.port = port_input.get()
         self.host = str(self.host)
         self.port = int(self.port)
-        root.destroy()
+        self.run()
+    def run(self):
+        self.server = Server(host=self.host, port=self.port)
+        self.server.start()
+    def quit(self):
+        exit = threading.Thread(target=self.exit)
+        exit.start()
+    def exit(self):
+        print('Closing all connections...')
+        for connection in self.server.connections:
+            connection.sc.close()
+        print('Shutting down the server...')
+        os._exit(0)
 
 
 if __name__ == '__main__':
-    # app = App()
-    # app.get_host_port()
-    # HOST,PORT = app.host,app.port
-    #
-    HOST = '127.0.0.1'
-    PORT = 1060
-    # # Create and start server thread
-    server = Server(HOST, PORT)
-    server.start()
-    # #
-    exit = threading.Thread(target=exit, args=(server,))
-    exit.start()
+    app = App()
+    app.start()
+    
