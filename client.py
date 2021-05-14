@@ -271,17 +271,6 @@ def main():
     app.get_host_port()
     app.interface()
 
-    def get_str_host_port(self, host_input, port_input,user_import, root):
-        self.host1 = host_input.get()
-        self.port1 = port_input.get()
-        print(self.host1)
-        print(type(self.host1))
-        self.host1 = str(self.host1)
-        self.port1 = int(self.port1)
-        self.user = user_import.get()
-        root.quit()
-        root.destroy()
-
 
 
 def main():
