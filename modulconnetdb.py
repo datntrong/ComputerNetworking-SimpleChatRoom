@@ -5,7 +5,7 @@ def connect():
         'host': 'localhost',
         'database': 'chat',
         'user': 'root',
-        'password': 'ichyyyyy'
+        'password': 'MarigoldHy2021'
     }
 
     # Biến lưu trữ kết nối
@@ -89,8 +89,8 @@ def load_old_message():
         print(message[2])
 
 # Test thử
-conn = connect()
-print(conn)
-load_old_message()
-
+# conn = connect()
+# print(conn)
+# load_old_message()
+# create_database()
 # insert_book('dnt', 'huhu', '2021-10-15 22:22:22')
