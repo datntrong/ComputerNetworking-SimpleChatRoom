@@ -18,6 +18,7 @@ class Send(threading.Thread):
         sock (socket.socket): Socket kết nối với server.
         name (str): username của client.
     """
+
     def __init__(self, sock, name):
         super().__init__()
         self.sock = sock
@@ -101,6 +102,7 @@ class Client:
         name (str): username của client.
         messages (tk.Listbox): Đối tượng tk.Listbox gồm tất cả tin nhắn hiện trên cửa sổ chat.
     """
+
     def __init__(self, host, port, name):
         self.host = host
         self.port = port
@@ -222,12 +224,12 @@ class App:
         # edit.add_command(label="Cut")
         # edit.add_command(label="Copy")
         # edit.add_command(label="Paste")
-        edit.add_command(label="Delete", command=lambda: self.del_db())
+        edit.add_command(label="Delete", command=lambda: self.del_db(frm_messages))
         # edit.add_command(label="Select All")
 
         menubar.add_cascade(label="Edit", menu=edit)
         help = tk.Menu(menubar, tearoff=0)
-        help.add_command(label="About",command = lambda :self.about())
+        help.add_command(label="About", command=lambda: self.about())
         menubar.add_cascade(label="Help", menu=help)
 
         root.config(menu=menubar)
@@ -267,9 +269,9 @@ class App:
     def command_btn_send(self, text_input):
         self.client.send(text_input)
 
-    def del_db(self):
+    def del_db(self, frm_message):
+        frm_message.destroy()
         delete_database()
-        self.client.load_old_message()
 
     def about(self):
         webbrowser.open('https://github.com/datntrong/ComputerNetworking-SimpleChatRoom')  # Go to example.com
@@ -310,6 +312,7 @@ class App:
         self.user = user_import.get()
         root.quit()
         root.destroy()
+
 
 def main():
     app = App()

@@ -29,7 +29,7 @@ def arr_message():
     db_config = db_conf
     db_config['database'] = 'chat'
     try:
-        conn = connect()
+        conn = connect(db_config)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM chat.chatroom;")
 
@@ -51,22 +51,37 @@ def arr_message():
 
 
 def delete_database():
-    query = "DELETE FROM chat.chatroom;"
-    conn = connect(db_conf)
-    cursor = conn.cursor()
-    cursor.execute(query)
-    conn.commit()
+    try:
+        query = "DELETE FROM chat.chatroom;"
+        conn = connect(db_conf)
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+    except sql.Error as e:
+        print(e)
 
+    finally:
+        # Đóng kết nối
+        cursor.close()
+        conn.close()
 
 def create_database():
-    query1 = "CREATE DATABASE IF NOT EXISTS `chat`;"
-    query2 = "CREATE TABLE IF NOT EXISTS `chat`.`chatroom` (`user` VARCHAR(45) NULL DEFAULT NULL,`text` TEXT NULL DEFAULT NULL,`datetimechat` DATETIME NULL DEFAULT NULL)ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
-    conn = connect(db_conf)
+    try:
+        query1 = "CREATE DATABASE IF NOT EXISTS `chat`;"
+        query2 = "CREATE TABLE IF NOT EXISTS `chat`.`chatroom` (`user` VARCHAR(45) NULL DEFAULT NULL,`text` TEXT NULL DEFAULT NULL,`datetimechat` DATETIME NULL DEFAULT NULL)ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
+        conn = connect(db_conf)
 
-    cursor = conn.cursor()
-    cursor.execute(query1)
-    cursor.execute(query2)
+        cursor = conn.cursor()
+        cursor.execute(query1)
+        cursor.execute(query2)
+    except sql.Error as e:
+        print(e)
 
+    finally:
+        print()
+        # Đóng kết nối
+        # cursor.close()
+        # conn.close()
 
 
 def insert_message(user, text, datetime):
@@ -111,10 +126,11 @@ def load_old_message():
 
 
 # Test thử
-#conn = connect()
+# db_conf['database'] = 'chat'
+# conn = connect(db_conf)
 # print(conn)
 # delete_database()
-create_database()
+# create_database()
 # load_old_message()
 
 # insert_book('dnt', 'huhu', '2021-10-15 22:22:22')
