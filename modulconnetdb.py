@@ -53,6 +53,7 @@ def delete_database():
     conn = connect()
     cursor = conn.cursor()
     cursor.execute(query)
+    conn.commit()
 
 
 def create_database():

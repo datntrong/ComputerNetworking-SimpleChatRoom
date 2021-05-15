@@ -11,25 +11,34 @@ import datetime
 
 
 class Send(threading.Thread):
+    """
+    Luồng gửi tin nhắn: lắng nghe input từ dòng lệnh của người dùng.
 
+    Attributes:
+        sock (socket.socket): Socket kết nối với server.
+        name (str): username của client.
+    """
     def __init__(self, sock, name):
         super().__init__()
         self.sock = sock
         self.name = name
 
     def run(self):
-
+        """
+        Lắng nghe input của người dùng từ dòng lệnh và gửi nó đến server.
+        Gõ 'QUIT' sẽ đóng kết nối với server và thoát chương trình.
+        """
         while True:
             print('{}: '.format(self.name), end='')
             sys.stdout.flush()
             message = sys.stdin.readline()[:-1]
 
-            # Type 'QUIT' to leave the chatroom
+            # Gõ 'QUIT' để rời phòng chat
             if message == 'QUIT':
                 self.sock.sendall('Server: {} has left the chat.'.format(self.name).encode('ascii'))
                 break
 
-            # Send message to server for broadcasting
+            # Gửi tin đến server để broadcasting
             else:
                 self.sock.sendall('{}: {}'.format(self.name, message).encode('ascii'))
 
@@ -39,6 +48,14 @@ class Send(threading.Thread):
 
 
 class Receive(threading.Thread):
+    """
+    Luồng nhận tin nhắn: lắng nghe tin nhắn từ server gửi tới.
+
+    Attributes:
+        sock (socket.socket): Socket kết nối với server.
+        name (str): username của client.
+        messages (tk.Listbox): Đối tượng tk.Listbox gồm tất cả tin nhắn hiện trên cửa sổ chat.
+    """
 
     def __init__(self, sock, name):
         super().__init__()
@@ -47,7 +64,10 @@ class Receive(threading.Thread):
         self.messages = None
 
     def run(self):
-
+        """
+        Nhận dữ liệu từ server và hiện thị lên cửa sổ chat.
+        Luôn lắng nghe dữ liệu được gửi tới đến khi socket của client hoặc server đóng. 
+        """
         while True:
             message = self.sock.recv(1024).decode('ascii')
 
@@ -59,11 +79,11 @@ class Receive(threading.Thread):
                     print('\r{}\n{}: '.format(message, self.name), end='')
 
                 else:
-                    # Thread has started, but client GUI is not yet ready
+                    # Bắt đầu luồng mới nhưng GUI chưa xuất hiện
                     print('\r{}\n{}: '.format(message, self.name), end='')
 
             else:
-                # Server has closed the socket, exit the program
+                # Server đã đóng socket, thoát chương trình
                 print('\nOh no, we have lost connection to the server!')
                 print('\nQuitting...')
                 self.sock.close()
@@ -71,7 +91,16 @@ class Receive(threading.Thread):
 
 
 class Client:
+    """
+    Quản lý các kết nối client-server và tích hợp với GUI.
 
+    Attributes:
+        host (str): Địa chỉ IP của server
+        port (int): Port của server.
+        sock (socket.socket): Socket kết nối với server.
+        name (str): username của client.
+        messages (tk.Listbox): Đối tượng tk.Listbox gồm tất cả tin nhắn hiện trên cửa sổ chat.
+    """
     def __init__(self, host, port, name):
         self.host = host
         self.port = port
@@ -80,6 +109,13 @@ class Client:
         self.messages = None
 
     def start(self):
+        """
+        Thiết lập kết nối client-server. Nhận input của nguòw dùng,
+        tạo và bắt đầu luồng gửi và nhận tin nhắn, đồng thời gửi thông báo cho các client đã kết nối.\
+
+        Returns:
+            Mội đối tượng Receive đại dịên cho luồng nhận tin.
+        """
 
         print('Trying to connect to {}:{}...'.format(self.host, self.port))
         self.sock.connect((self.host, self.port))
@@ -91,11 +127,11 @@ class Client:
         print()
         print('Welcome, {}! Getting ready to send and receive messages...'.format(self.name))
 
-        # Create send and receive threads
+        # Tạo luồng gửi và nhận tin nhắn
         send = Send(self.sock, self.name)
         receive = Receive(self.sock, self.name)
 
-        # Start send and receive threads
+        # Bắt đầu luồng gửi và nhận tin nhắn
         send.start()
         receive.start()
 
@@ -112,6 +148,14 @@ class Client:
             self.messages.insert(tk.END, '{}: {}'.format(message[0], message[1]))
 
     def send(self, text_input):
+        """
+        Gửi dữ liệu của text_input tới khung chat. Phương thức này phải được liên kết text_input và
+         bất kỳ widgets khác để thực thi, ví dụ: buttons.
+        Gõ 'QUIT' sẽ đóng kết nối với server và thoát chương trình.
+
+        Args:
+            text_input(tk.Entry): Một đối tượng tk.Entry là input của người dùng.
+        """
         try:
             message = text_input.get()
             text_input.delete(0, tk.END)
@@ -119,7 +163,7 @@ class Client:
             message = text_input
         self.messages.insert(tk.END, '{}: {}'.format(self.name, message))
 
-        # Type 'QUIT' to leave the chatroom
+        # Gõ 'QUIT' để rời phòng chat
         if message == 'QUIT':
             self.sock.sendall('Server: {} has left the chat.'.format(self.name).encode('ascii'))
 
@@ -127,7 +171,7 @@ class Client:
             self.sock.close()
             os._exit(0)
 
-        # Send message to server for broadcasting
+        # Gửi tin đến server để broadcasting
         else:
             datetime_object = datetime.datetime.now()
             stri = str(datetime_object)
@@ -265,14 +309,6 @@ class App:
         self.user = user_import.get()
         root.quit()
         root.destroy()
-
-
-def main():
-    # create_database()
-    app = App()
-    app.get_host_port()
-    app.interface()
-
 
 def main():
     # create_database()

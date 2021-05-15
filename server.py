@@ -4,6 +4,14 @@ import socket
 import tkinter as tk
 
 class Server(threading.Thread):
+    """
+    Quản lý các kết nối của server.
+
+    Attributes:
+        connections (list): Danh sách các đối tượng ServerSocket đại diện cho các client kết nối đến server.
+        host (str): Địa chỉ IP của server.
+        port (int): Port của server.
+    """
 
     def __init__(self, host, port):
         super().__init__()
@@ -12,7 +20,12 @@ class Server(threading.Thread):
         self.port = port
 
     def run(self):
-
+        """
+        Tạo một socket để lắng nghe các. Sokcet sử  dụng SO_REUSEADDR để cho phép các client
+        liên kết với một địa chỉ socket đã được sử dụng trước đó.
+        Với mỗi kết nối mới, một luồng ServerSocket sẽ được bắt đầu đễ dễ dàng kết nối với
+        server. Tất cả đối tượng ServerSocket được lưu trong connections.
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.host, self.port))
@@ -21,35 +34,52 @@ class Server(threading.Thread):
         print('Listening at', sock.getsockname())
 
         while True:
-            # Accept new connection
+            # Nhận một kết nối mới
             sc, sockname = sock.accept()
             print('Accepted a new connection from {} to {}'.format(sc.getpeername(), sc.getsockname()))
 
-            # Create new thread
+            # Tạo luồng
             server_socket = ServerSocket(sc, sockname, self)
 
-            # Start new thread
+            # Bắt đầu luồng mới
             server_socket.start()
 
-            # Add thread to active connections
+            # Thêm luồng mới vào connections
             self.connections.append(server_socket)
             print('Ready to receive messages from', sc.getpeername())
 
     def broadcast(self, message, source):
+         """
+        Gửi tin nhắn tới tất cả các client, trừ người gửi tin.
 
+        Args:
+            message (str): Tin nhắn.
+            source (tuple): Địa chỉ người gửi.
+        """
         for connection in self.connections:
 
-            # Send to all connected clients except the source client
             if connection.sockname != source:
                 connection.send(message)
 
     def remove_connection(self, connection):
+        """
+        Xoá một luồng ServerSocket ở connections.
 
+        Args:
+            connection (ServerSocket): Luồng ServerSocket cần xoá.
+        """
         self.connections.remove(connection)
 
 
 class ServerSocket(threading.Thread):
+    """
+    Giao tiếp với một client đã kết nối.
 
+    Attributes:
+        sc (socket.socket): Socker kết nối.
+        sockname (tuple): Địa chỉ của client.
+        server (Server): Luồng server.
+    """
     def __init__(self, sc, sockname, server):
         super().__init__()
         self.sc = sc
@@ -57,7 +87,10 @@ class ServerSocket(threading.Thread):
         self.server = server
 
     def run(self):
-
+        """
+        Nhận dữ liệu từ client và gửi tin tới các client khác 
+        Nếu một client rời phòng chat, đóng kết nối socket và xoá ServerSocket cuả nó.
+        """
         while True:
             message = self.sc.recv(1024).decode('ascii')
             if message:
@@ -67,10 +100,15 @@ class ServerSocket(threading.Thread):
                 # Client has closed the socket, exit the thread
                 print('{} has closed the connection'.format(self.sockname))
                 self.sc.close()
-                server.remove_connection(self)
+                self.server.remove_connection(self)
                 return
 
     def send(self, message):
+        """
+        Gửi tin nhắn tới các kết nối
+        Args:
+            message (str): Tin nhắn.
+        """
         self.sc.sendall(message.encode('ascii'))
 
 
