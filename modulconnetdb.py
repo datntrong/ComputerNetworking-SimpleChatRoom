@@ -1,13 +1,13 @@
 import mysql.connector as sql
 
-
-def connect():
-    db_config = {
+db_conf = {
         'host': 'localhost',
         'user': 'root',
-        'database': 'chat',
         'password': 'ichyyyyy'
     }
+
+def connect(db_config):
+
     print(type(db_config))
     # Biến lưu trữ kết nối
     conn = None
@@ -26,6 +26,8 @@ def connect():
 
 def arr_message():
     arr_messages = []
+    db_config = db_conf
+    db_config['database'] = 'chat'
     try:
         conn = connect()
         cursor = conn.cursor()
@@ -50,17 +52,21 @@ def arr_message():
 
 def delete_database():
     query = "DELETE FROM chat.chatroom;"
-    conn = connect()
+    conn = connect(db_conf)
     cursor = conn.cursor()
     cursor.execute(query)
     conn.commit()
 
 
 def create_database():
-    query = "CREATE SCHEMA IF NOT EXISTS `chat` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ; USE `chat` ; CREATE TABLE IF NOT EXISTS `chat`.`chatroom` (`user` VARCHAR(45) NULL DEFAULT NULL,`text` TEXT NULL DEFAULT NULL,`datetimechat` DATETIME NULL DEFAULT NULL)ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
-    conn = connect()
+    query1 = "CREATE DATABASE IF NOT EXISTS `chat`;"
+    query2 = "CREATE TABLE IF NOT EXISTS `chat`.`chatroom` (`user` VARCHAR(45) NULL DEFAULT NULL,`text` TEXT NULL DEFAULT NULL,`datetimechat` DATETIME NULL DEFAULT NULL)ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
+    conn = connect(db_conf)
+
     cursor = conn.cursor()
-    cursor.execute(query)
+    cursor.execute(query1)
+    cursor.execute(query2)
+
 
 
 def insert_message(user, text, datetime):
@@ -69,9 +75,10 @@ def insert_message(user, text, datetime):
     # INSERT INTO `chat`.`chatroom`(`user`, `text`, `datetimechat`) VALUES('dnt', '456', '2021-05-15 13:00:00');
 
     args = (user, text, datetime)
-
+    db_config = db_conf
+    db_config['database'] = 'chat'
     try:
-        conn = connect()
+        conn = connect(db_config)
 
         cursor = conn.cursor()
         cursor.execute(query, args)
@@ -104,10 +111,10 @@ def load_old_message():
 
 
 # Test thử
-conn = connect()
-print(conn)
-delete_database()
-# create_database()
+#conn = connect()
+# print(conn)
+# delete_database()
+create_database()
 # load_old_message()
 
 # insert_book('dnt', 'huhu', '2021-10-15 22:22:22')
