@@ -275,6 +275,7 @@ class App:
         webbrowser.open('https://github.com/datntrong/ComputerNetworking-SimpleChatRoom')  # Go to example.com
 
     def get_host_port(self):
+        create_database()
         root = tk.Tk()
         root.geometry("300x250")
 
@@ -311,7 +312,6 @@ class App:
         root.destroy()
 
 def main():
-    # create_database()
     app = App()
     app.get_host_port()
     app.interface()

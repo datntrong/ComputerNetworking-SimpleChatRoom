@@ -49,13 +49,14 @@ class Server(threading.Thread):
             print('Ready to receive messages from', sc.getpeername())
 
     def broadcast(self, message, source):
-         """
+        """
         Gửi tin nhắn tới tất cả các client, trừ người gửi tin.
 
         Args:
             message (str): Tin nhắn.
             source (tuple): Địa chỉ người gửi.
         """
+
         for connection in self.connections:
 
             if connection.sockname != source:
