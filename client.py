@@ -270,15 +270,16 @@ class App:
         self.client.send(text_input)
 
     def del_db(self, frm_message):
-        frm_message.destroy()
         delete_database()
 
     def about(self):
         webbrowser.open('https://github.com/datntrong/ComputerNetworking-SimpleChatRoom')  # Go to example.com
 
     def get_host_port(self):
+
         create_database()
         root = tk.Tk()
+        root.title("Client")
         root.geometry("300x250")
 
         host_lb = tk.Label(root, text="HOST").place(x=30, y=50)
